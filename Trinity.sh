@@ -44,3 +44,4 @@ sudo locale-gen
 echo "===> Instalación completada correctamente"
 echo "Cerrá sesión y seleccioná 'Trinity' en el gestor de inicio"
 
+
