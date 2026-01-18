@@ -1,20 +1,15 @@
 #!/bin/bash
 
-# Comprobar si el usuario tiene privilegios de root
-if [ "$EUID" -ne 0 ]; then
-  echo "Por favor, ejecuta el script como root o usando sudo."
-  exit
-fi
 
 echo "--- Iniciando instalación de Trinity Desktop Environment (TDE) ---"
 
 # 1. Actualizar el sistema
 echo "Actualizando índices de paquetes..."
-apt update && apt upgrade -y
+sudo apt update && apt upgrade -y
 
 # 2. Instalar dependencias necesarias para gestionar repositorios
 echo "Instalando dependencias necesarias..."
-apt install -y wget gnupg software-properties-common
+sudo apt install -y wget gnupg software-properties-common
 
 # 3. Añadir la llave GPG del repositorio de Trinity
 echo "Añadiendo llave GPG..."
@@ -28,11 +23,11 @@ echo "deb-src http://mirror.ppa.trinitydesktop.org/trinity/deb/trinity-sb trixie
 
 # 5. Actualizar e instalar el entorno
 echo "Actualizando con el nuevo repositorio..."
-apt update
+sudo apt update
 
 echo "Instalando el escritorio Trinity (mínimo)..."
 # tde-trinity es el metapaquete principal
-apt install -y tde-trinity
+sudo rmapt install -y tde-trinity
 
 echo "--- Instalación completada ---"
 echo "Por favor, reinicia tu equipo y selecciona Trinity en la pantalla de inicio de sesión."
