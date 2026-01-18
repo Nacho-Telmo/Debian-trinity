@@ -1,38 +1,24 @@
 #!/bin/bash
 
-# Script para instalar Trinity Desktop Environment en Debian 13 (Trixie) con idioma español
+echo "--- Iniciando instalación de Trinity (Método Moderno) ---"
 
-echo "--- Iniciando instalación de Trinity Desktop Environment (TDE) ---"
-
-# 1. Actualizar el sistema
-echo "Actualizando índices de paquetes..."
-sudo apt update && sudo apt upgrade -y
-
-# 2. Instalar dependencias necesarias
-echo "Instalando dependencias de gestión de repositorios..."
-sudo apt install -y wget gnupg software-properties-common
-
-# 3. Configurar la llave GPG del repositorio
-echo "Añadiendo llave GPG de Trinity..."
-# Descarga la llave y la guarda en el llavero del sistema
-wget -qO - http://mirror.ppa.trinitydesktop.org/trinity/deb/trinity-keyring.gpg | sudo apt-key add -
-
-# 4. Añadir el repositorio oficial para Debian 13 (Trixie)
-echo "Configurando repositorios para Trixie..."
-sudo sh -c 'echo "deb http://mirror.ppa.trinitydesktop.org/trinity/deb/trinity-sb trixie main" > /etc/apt/sources.list.d/trinity.list'
-sudo sh -c 'echo "deb-src http://mirror.ppa.trinitydesktop.org/trinity/deb/trinity-sb trixie main" >> /etc/apt/sources.list.d/trinity.list'
-
-# 5. Actualizar con el nuevo repositorio
-echo "Sincronizando con el repositorio de Trinity..."
+# 1. Actualizar repositorios
 sudo apt update
 
-# 6. Instalación del escritorio y soporte de idioma español
-echo "Instalando escritorio Trinity y paquetes de idioma español..."
-# tde-trinity: Base del escritorio
-# tde-i18n-es-trinity: Traducciones al español
-# tde-i18n-es-ar-trinity: (Opcional) Si prefieres español de Argentina
+# 2. Instalar solo wget (necesario para bajar la llave)
+sudo apt install -y wget
+
+# 3. Descargar la llave GPG al nuevo formato de llavero (reemplaza a apt-key)
+echo "Configurando llave de seguridad..."
+wget -qO - http://mirror.ppa.trinitydesktop.org/trinity/deb/trinity-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/trinity-keyring.gpg
+
+# 4. Añadir el repositorio vinculándolo directamente a su llave
+echo "Añadiendo repositorio de Trinity para Debian Trixie..."
+echo "deb [signed-by=/usr/share/keyrings/trinity-keyring.gpg] http://mirror.ppa.trinitydesktop.org/trinity/deb/trinity-sb trixie main" | sudo tee /etc/apt/sources.list.d/trinity.list
+echo "deb-src [signed-by=/usr/share/keyrings/trinity-keyring.gpg] http://mirror.ppa.trinitydesktop.org/trinity/deb/trinity-sb trixie main" | sudo tee -a /etc/apt/sources.list.d/trinity.list
+
+# 5. Actualizar e instalar
+sudo apt update
 sudo apt install -y tde-trinity tde-i18n-es-trinity
 
-echo "--- Proceso finalizado ---"
-echo "Recomendación: Reinicia el sistema para aplicar los cambios."
-echo "En la pantalla de login, selecciona 'TDE' o 'Trinity' como entorno."
+echo "--- Instalación finalizada ---"
