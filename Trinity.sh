@@ -1,46 +1,58 @@
 #!/bin/bash
-# Trinity Desktop Environment en Debian 12 (Bookworm)
-# Método correcto: keyring oficial + repo firmado
-# Autor: Nacho Telmo
-
 set -e
 
-echo "===> Instalando dependencias..."
-sudo apt update
-sudo apt install -y wget ca-certificates locales
+echo "===> Instalador automático Trinity Desktop - Debian 12"
 
+### VARIABLES
+DIST="bookworm"
+REPO_URL="https://mirror.trinitydesktop.org/trinity/deb/trinity-r14"
 KEYRING="/usr/share/keyrings/trinity.gpg"
-REPO_FILE="/etc/apt/sources.list.d/trinity.list"
-REPO_URL="https://ppa.trinitydesktop.org/trinity/deb/trinity-r14.1.x"
-KEY_URL="https://ppa.trinitydesktop.org/trinity/deb/trinity-keyring.gpg"
+LIST_FILE="/etc/apt/sources.list.d/trinity.list"
 
+### 1. Comprobar sudo
+if ! sudo -n true 2>/dev/null; then
+  echo "ERROR: El usuario debe tener permisos sudo"
+  exit 1
+fi
+
+### 2. Dependencias necesarias
+echo "===> Instalando dependencias..."
+sudo apt update -qq
+sudo apt install -y wget ca-certificates gnupg locales
+
+### 3. Descargar keyring oficial (método moderno)
 echo "===> Descargando keyring oficial de Trinity..."
-sudo wget -qO "$KEYRING" "$KEY_URL"
+sudo wget -qO "$KEYRING" \
+https://mirror.trinitydesktop.org/trinity/deb/trinity-keyring.gpg
+
 sudo chmod 644 "$KEYRING"
 
-echo "===> Agregando repositorio Trinity para Debian 12..."
-echo "deb [signed-by=$KEYRING] $REPO_URL bookworm main" \
- | sudo tee "$REPO_FILE" > /dev/null
+### 4. Agregar repositorio Trinity
+echo "===> Agregando repositorio Trinity..."
+echo "deb [signed-by=$KEYRING] $REPO_URL $DIST main" | sudo tee "$LIST_FILE" > /dev/null
 
-echo "===> Actualizando índices de paquetes..."
-sudo apt update
+### 5. Actualizar índices
+echo "===> Actualizando repositorios..."
+sudo apt update -qq
 
-echo "===> Instalando Trinity Desktop (metapaquete)..."
-sudo apt install -y trinity
+### 6. Instalar Trinity Desktop completo
+echo "===> Instalando Trinity Desktop..."
+sudo DEBIAN_FRONTEND=noninteractive apt install -y trinity
 
-echo "===> Instalando idioma español..."
-sudo apt install -y \
- tde-i18n-es \
- tde-i18n-es-ar \
- tde-i18n-es-es
-
-echo "===> Configurando locales..."
-sudo sed -i 's/^# es_AR.UTF-8 UTF-8/es_AR.UTF-8 UTF-8/' /etc/locale.gen
-sudo sed -i 's/^# es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /etc/locale.gen
+### 7. Configurar idioma español
+echo "===> Configurando idioma español..."
+sudo sed -i 's/^# *es_AR.UTF-8 UTF-8/es_AR.UTF-8 UTF-8/' /etc/locale.gen
+sudo sed -i 's/^# *es_ES.UTF-8 UTF-8/es_ES.UTF-8 UTF-8/' /etc/locale.gen
 sudo locale-gen
+sudo update-locale LANG=es_AR.UTF-8
 
-echo "===> Instalación completada correctamente"
-echo "Cerrá sesión y seleccioná Trinity en el gestor de inicio"
+### 8. Final
+echo "========================================"
+echo "Trinity Desktop instalado correctamente"
+echo "Idioma: Español"
+echo "Reiniciá el sistema y elegí Trinity en el login"
+echo "========================================"
+
 
 
 
